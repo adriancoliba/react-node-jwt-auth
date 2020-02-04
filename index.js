@@ -74,7 +74,9 @@ app.post('/getToken', (req, res) => {
 app.get('/protected', passport.authenticate('jwt', {session: false}), (req, res) => {
     res.send('I am protected')
 })
-
+app.get('/getUser', passport.authenticate('jwt', {session: false}), (req, res) => {
+    res.send(req.user)
+})
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT);
