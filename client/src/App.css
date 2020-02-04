@@ -1,0 +1,9 @@
+#root {
+  height: 100%;
+  box-sizing: border-box;
+}
+.app-container {
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #f6f6f6;
+}
