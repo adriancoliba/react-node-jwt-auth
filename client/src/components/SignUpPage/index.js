@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, CircularProgress, CssBaseline, Button, Avatar,
-  Typography, Container, Grid, Checkbox, FormControlLabel, Backdrop, Modal, Fade } from '@material-ui/core';
+  Typography, Container, Grid, Checkbox, FormControlLabel } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { withStyles } from "@material-ui/core";
 import style from "./style";
 import { Link } from 'react-router-dom';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import globalStyle from "../../utils/globalStyle";
+import axios from "axios";
 
-const SignUpPage = ({classes}) => {
+const SignUpPage = ({classes, history}) => {
   const [user, setUser] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
   const [message, setMessage] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => { 
-      if(setMessage === 'successful') setTimeout(() => { setOpenModal(true);
-      setUser(null);
-    }, 500)
+    if(message === 'successful'){
+      setTimeout(() => { history.push('/authenticated') }, 2000)
+    }
+    return () => { setUser(null) } 
   }, [message]);
-
-  useEffect(() => { return () => { setUser(null) } }, []);
 
   const handleChangeUser = event => {
     setUser({
@@ -37,12 +35,22 @@ const SignUpPage = ({classes}) => {
       const { email, password } = user
       if(!regex.test(email)) return setMessage('Email badly formatted')
       if(password.length < 6) return setMessage('Password too short')
+      setLoading(true);
 
-      // make a call to backend
+      axios.post('/getToken', {
+        email: user.email, password: user.password
+      }).then( res => {
+        if(res.data){
+          localStorage.setItem('jwt', res.data)
+          setLoading(false);
+          setMessage('successful')
+        }
+      }).catch(err => {
+        setLoading(false)
+        setMessage(err.message)
+      })
     }
   };
-
-  const handleCloseModal = () => { setOpenModal(true) }
 
   return (
     <Container component="main" maxWidth="xs" className={classes.containerAuth}>
@@ -112,34 +120,6 @@ const SignUpPage = ({classes}) => {
         </form>
         {loading && <CircularProgress/>}
       </div>
-
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        className={classes.modal}
-        open={openModal}
-        onClose={handleCloseModal}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
-      >
-        <Fade in={openModal}>
-          <div className={classes.paperModal}>
-            <Avatar className={classes.avatar}>
-              <CheckCircleOutlineIcon />
-            </Avatar>
-            <br/>
-            <Typography variant="h2" id="transition-modal-title">Successfully signed up</Typography>
-            <br/><br/>
-            <Link to={'/signin'} className={classes.textDecorationNone}>
-              <Button variant={'outlined'} className={classes.buttonSignIn}>Sign In</Button>
-            </Link>
-          </div>
-        </Fade>
-      </Modal>
-
     </Container>
   );
 }

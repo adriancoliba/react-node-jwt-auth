@@ -1,5 +1,3 @@
-import { makeStyles } from "@material-ui/core/styles";
-
 const globalStyle = (theme) => ({
   containerAuth: {
     textAlign: 'center',

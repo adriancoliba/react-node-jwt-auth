@@ -25,6 +25,7 @@ const style = (theme) => ({
   },
   registerMessageGreen: {
     color: lightGreen[500],
+    fontWeight: 'bold',
     paddingTop: 15,
   },
   links: {
