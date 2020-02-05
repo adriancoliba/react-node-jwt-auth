@@ -1,29 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios';
 
-const AuthenticatedComponent = ({history}) => {
-  const [user, setUser] = useState(null);
-
+const AuthenticatedComponent = props => {
   useEffect(() => {
-    const jwt = localStorage.getItem('jwt');
-    if(!jwt) return history.push('/signup')
-
-    axios.get('/getUser', {headers: { Authorization: `Bearer ${jwt}` }})
-      .then( res => {setUser(res.data)})
-      .catch( err => {
-        console.log(err.message)
-        localStorage.removeItem('jwt');
-        history.push('/signup')
-      })
+    console.log('authenticated')
   }, [])
 
-  user && console.log(user)
+  if(!props.user) return <div></div>;
 
-  return (
-    <div>
-      This is the authenticated page
-    </div>
-  )
+  return <div>
+    user: {props.user.email}
+    <br/>
+    id: {props.user.id}
+  </div>
 }
 
 export default AuthenticatedComponent;

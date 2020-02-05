@@ -1,21 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import axios from 'axios';
+import { withRouter } from 'react-router-dom';
 import Home from './components/Home'
 import AuthenticatedComponent from './components/AuthenticatedComponent';
 import SignUpPage from './components/SignUpPage'
 
-function App() {
+function App(props) {
   const [user, setUser] = useState(null);
+  const [authenticate, setAuthenticate] = useState(false);
+  const jwt = localStorage.getItem('jwt');
+
+  useEffect(() => {
+    axios.get('/getUser', {headers: { Authorization: `Bearer ${jwt}` }})
+      .then( res => { 
+        setUser(res.data) 
+        props.history.push('/authenticated')
+      })
+      .catch( err => {
+        localStorage.removeItem('jwt');
+        props.history.push('/signup')
+    })
+  }, [authenticate])
+
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route path='/authenticated' component={AuthenticatedComponent}/>
-        <Route exact path="/" component={Home}/>
-        <Route path='/signup' component={SignUpPage}/>
-      </Switch>
-    </BrowserRouter>
+    <React.Fragment>
+      {jwt && 
+        <Route path='/authenticated' render={
+          props => (<AuthenticatedComponent {...props} user={user} setAuthenticate={setAuthenticate}/>)}
+        />
+      }
+      <Route path='/signup' render={
+        props => (<SignUpPage {...props} setAuthenticate={setAuthenticate}/>)}
+        />
+      <Route exact path="/" component={Home}/>
+    </React.Fragment>
   );
 }
 
-export default App;
+export default withRouter(App);

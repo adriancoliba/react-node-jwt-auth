@@ -8,14 +8,14 @@ import { Link } from 'react-router-dom';
 import globalStyle from "../../utils/globalStyle";
 import axios from "axios";
 
-const SignUpPage = ({classes, history}) => {
+const SignUpPage = ({classes, setAuthenticate}) => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => { 
     if(message === 'successful'){
-      setTimeout(() => { history.push('/authenticated') }, 2000)
+      setTimeout(() => { setAuthenticate(true) }, 1000)
     }
     return () => { setUser(null) } 
   }, [message]);
